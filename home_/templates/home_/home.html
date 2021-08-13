@@ -1,0 +1,27 @@
+
+{% extends "data_presentation/base.html" %}
+{% block content %}
+<script>
+function myFunction() {
+  urls = Array.from(document.querySelectorAll('.rg_di .rg_meta')).map(el=>JSON.parse(el.textContent).ou);
+		window.open('data:text/csv;charset=utf-8,' + escape(urls.join('\n')));
+}
+</script>
+	{% for o in categories %}
+		<a class="nav-item nav-link" href="{% url 'tabluar'%}">{{ o.name }}</a>
+		
+	{% endfor %}
+		<form method="get" action="http://images.google.com/images" >
+			<input type="text" name="q"><input type="submit" value="Search Google Images">
+		</form>
+
+		<button type="button" onclick="myFunction()">download the images!</button>
+
+		<div>
+		<script async src="https://cse.google.com/cse.js?cx=a86bbd72de515d281"></script>
+
+
+		<div class="gcse-searchbox" defaultToImageSearch ="true" enableAutoComplete="true"></div>
+		<div class="gcse-searchresults" disableWebSearch="true"></div>
+		</div>
+{% endblock content %}

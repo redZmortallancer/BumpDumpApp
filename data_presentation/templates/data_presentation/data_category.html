@@ -1,0 +1,12 @@
+
+{% extends "data_presentation/base.html" %}
+{% load render_table from django_tables %}
+{% block content %}
+
+	<div class="row">
+	    <div class="col-md-4">
+	    {% render_table projects %}
+	    </div>
+	</div>
+	
+{% endblock content %}
