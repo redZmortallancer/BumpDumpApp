@@ -87,5 +87,16 @@ td,tr {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px;
+}
+
+
+
+
+.canvas-overlay {
+  position: absolute;
+ 
+}
+
+.canvas-wrapper {
+  position: relative;
 }

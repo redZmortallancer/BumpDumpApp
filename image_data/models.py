@@ -5,13 +5,11 @@ import json
 
 class FirstDaset(models.Model):
 
-    image_id = models.CharField(max_length=100,primary_key='True')
+    id =    models.IntegerField(primary_key = 'True')
+    image_id = models.CharField(max_length=100)
     image_file_name = models.CharField(max_length=100)
-    category_id = models.CharField(max_length=100)
-    category_name = models.CharField(max_length=100)
-    super_category_name =  models.CharField(max_length=100,default='default string')
-
-    photo = models.ImageField(upload_to='datasetOne')
+    coco_Url = models.CharField( max_length=100)
+    flicker_Url = models.CharField( max_length=100)
 
     def get_categories(self):
         return self.annotations.all()
@@ -26,6 +24,7 @@ class annotations(models.Model):
         super_category_name =  models.CharField(max_length=100,default='default string') 
         bounding_box = models.CharField(max_length=200,default='default string') 
         segmentaions = models.CharField(max_length=400,default='default string') 
+        iscrowd = models.CharField(max_length=20)
 
         def set_bounding_box(self, x):
             self.foo = json.dumps(x)

@@ -3,48 +3,65 @@
 {% block content %}
 HEY what the fuck
 
-<script>
-    var c = document.getElementById("myCanvas");
-    var ctx = c.getContext("2d");
 
-    // Red rectangle
-    ctx.beginPath();
-    ctx.lineWidth = "6";
-    ctx.strokeStyle = "red";
-    ctx.rect(5, 5, 290, 140);  
-    ctx.stroke();
-</script> 
-
- <div style="width:100%">
-        <div class="col-md-9">
-
-            <div class="row">
-            {% for post in posts %}
-
-                {% if post.photo %}
-                <div class="col-md-4">
-                                    <div class="card my-2">
-                                        <img class="image-thumbail" src="{{post.photo.url}}" id ="{{post.image_id}}">
-                                        
-                                     <div class="card-body">
-                                        
-                                            <small>Category: {{post.image_file_name}}</small>
-                                            <small>Category: {{post.get_categories_count}}</small>
-                                        {% for obj  in post.get_categories %}
-                                            <small>Category: {{obj.category_id}}</small>
-                                            <small>Category-name: {{obj.category_name}}</small>
-                                            <small>super-Category: {{obj.super_category_name}}</small>
-                                        {% endfor %}
-                                        </div>
-                                        <a href="#" class="btn btn-outline-dark btn-sm m-1">View</a>
-                                    </div>
-                                </div>
-                {% endif %}
-            {% endfor %}
+<div id="search-app">
+    <div class="form-row">
             
+            <div class="form-group col-md-4">
+                <label for="category">category</label>
+                <select id="category" class="form-control" name="category"  v-model="query" v-on:change="performSearch()">
+                    <option selected> any </option>
+                    {% for v in categories %}
+                        <option value="{{ v.category_name }}">{{ v.category_name}}</option>
+                    {% endfor %}
 
-        </div>
+                </select>
+            </div>    
     </div>
+</div>
+
+
+
+<div >
+        <a href="#" class="btn btn-outline-dark btn-sm m-1">donwload all this shit!</a>
+        
+        
+               
+
+
+
+            {% comment %} <div class="row"> {% endcomment %}
+                {% for post in posts %}
+
+                    {% if post %}
+                    
+
+                                <div class="canvas-wrapper" style ="width :{{post.photo.width}}px" width="{{post.photo.width}}" height=" {{post.photo.height}}">
+                                    <canvas id="{{post.image_id}}" class="canvas-overlay"  width="700" height=" 700">
+                                    
+                                    </canvas>
+
+                                    <img src="{{post.coco_Url}}" alt = "hey no">
+                                    
+
+                                </div>
+                            {{post.segmentaions}}
+                            
+                            <b-container>
+                            <!-- <div class="card-body">
+                                
+                                    <small>Category: {{post.image_file_name}}</small>
+                                    <small>Category: {{post.get_categories_count}}</small>
+                                {% for obj  in post.get_categories %}
+                                    <small>Category: {{obj.bounding_box}}</small>
+                                    <small>Category-name: {{obj.category_name}}</small>
+                                    <small>super-Category: {{obj.super_category_name}}</small>
+                            {% endfor %}-->
+                            </b-container>
+                            <a href="#" class="btn btn-outline-dark btn-sm m-1">View</a>
+                    {% endif %}
+                {% endfor %}
+        {% comment %} </div> {% endcomment %}
     {% if is_paginated %}
 
                 {% if page_obj.has_previous %}
@@ -67,22 +84,97 @@ HEY what the fuck
 
         {% endif %}
         
-</di>
+</div>
+<script type="application/javascript"> 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+    {% for post in posts %}
+        {% if post %}
+        {{post.image_id}}
+            {% for obj  in post.get_categories %}
+                        
+                        
+                        var segmentaions = {{obj.segmentaions|safe}}; 
+                       
+                        var bbbx =  {{obj.bounding_box}};
+                        var c = document.getElementById("{{post.image_id}}");
+                        var ctx = c.getContext("2d");
+                        ctx.lineWidth = 2;
 
-<script>
- //{% for post in posts %}
-    var c = document.getElementById("397133");
-    var ctx = c.getContext("2d");
+                        console.log(getRandomInt(255));
+                        ctx.fillStyle = `rgba(${getRandomInt(255)}, ${getRandomInt(255)}, ${getRandomInt(255)}, 0.5)`;
 
-    // Red rectangle
-    ctx.beginPath();
-    ctx.lineWidth = "6";
-    ctx.strokeStyle = "red";
-    ctx.rect(5, 5, 290, 140);  
-    ctx.stroke();
+                        ctx.beginPath();
+                        ctx.fillText("{{obj.category_name}}",bbbx[0],bbbx[1]);
+                        if(segmentaions[0]){
 
-  //  {% endfor %}
-</script> 
+                            ctx.beginPath();
+                            ctx.moveTo(segmentaions[0][0], segmentaions[0][1]);
+                         
+                            
+                            for (let i = 2 ; i < segmentaions[0].length ; i+=2){
+                                ctx.lineTo(segmentaions[0][i],segmentaions[0][i+1]);
+                                ctx.fillRect(segmentaions[0][i],segmentaions[0][i+1],3,3);        
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                            console.log(typeof (segmentaions[0]));
+                            console.log(segmentaions[0].length);
+                        }
+                        ctx.rect(bbbx[0],bbbx[1], bbbx[2] , bbbx[3]);
+                        ctx.stroke();
+            {% endfor %}
+
+        {% endif %}
+    {% endfor %}
+</script>
+
+
+
+<script type="application/javascript"> 
+    const SearchApp = {
+        data() {
+            return {
+                query: '',
+                images : []
+            }
+        },
+        delimiters: ['[[', ']]'],
+        methods: {
+            performSearch() {
+                var data = {
+                    'query': this.query,
+                }
+                if(data.query == 'any'){
+                    console.log('its any bro! dont change shit')
+                }
+                fetch('/images/api/search/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then((response) => {
+                    console.log(response)
+                    return response.json()
+                })
+                .then((result) => {
+                    console.log("hey what the fuck")
+                    console.log(result.images)
+                    this.images = result.images
+                })
+                .catch((error) => {
+                    console.log('Error', error)
+                })
+            }
+        }
+    }
+
+    Vue.createApp(SearchApp).mount('#search-app')
+</script>
 
 
 

@@ -43,12 +43,16 @@ with open("TESTINGDATA/annotations/instances_val2017.json") as jsonFile:
             #print(f'{new_name} =  {savedIDs}')
             
          #print(cat_id)
-            firstDataset = FirstDaset(image_id =str(jsonObject['images'][i]['id']),
+            firstDataset = FirstDaset(
+                id = i + 1,
+                image_id =str(jsonObject['images'][i]['id']),
                 image_file_name=fileName,
+                coco_Url =str(jsonObject['images'][i]['coco_url']),
+                flicker_Url = str(jsonObject['images'][i]['flickr_url'])
                 
             )
 
-            firstDataset.photo.save(f'{fileName}',File(f))
+            #firstDataset.photo.save(f'{fileName}',File(f))
             firstDataset.save()
             
             for savedID in savedIDs:
@@ -57,9 +61,8 @@ with open("TESTINGDATA/annotations/instances_val2017.json") as jsonFile:
                 category_name = jsonObject['categories'][categoires[jsonObject['annotations'][savedID]['category_id']]]['name'],
                 super_category_name = jsonObject['categories'][categoires[jsonObject['annotations'][savedID]['category_id']]]['supercategory'],
                 bounding_box =  jsonObject['annotations'][savedID]['bbox'],
-                segmentaions =  jsonObject['annotations'][savedID]['segmentation']
-            
+                segmentaions =  jsonObject['annotations'][savedID]['segmentation'],
+                iscrowd = jsonObject['annotations'][savedID]['iscrowd']
                 )
                 Annotations.save()
-
            
